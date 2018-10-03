@@ -6,9 +6,12 @@ class App extends Component {
     var rootContainer = {
       padding : "10px"
     };
+    var rowMargin = {
+      margin : "0px"
+    };
     return (
       <div className="container-fluid" style={rootContainer}>  
-      <div className="row">
+      <div className="row" style={rowMargin}>
       <NavBar></NavBar>
       </div>
       </div>

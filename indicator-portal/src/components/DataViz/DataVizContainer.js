@@ -4,19 +4,18 @@ import 'bootstrap';
 
 class NavBar extends Component {
   render() {
+    var rowMargin = {
+      padding : "0px"
+    };
     return (
-  <div className="row">
-    <div className="col align-self-start">
+  <div className="row" >
+    <div className="col">
       One of three columns
     </div>
-    <div className="col align-self-center">
+    <div className="col">
       One of three columns
     </div>
-    <div className="col align-self-end">
-    <button type="button" id="sidebarCollapse" className="btn btn-info">
-                <i className="fas fa-align-left"></i>
-                <span>Toggle Sidebar</span>
-            </button>
+    <div className="col">
     </div>
   </div>
     );

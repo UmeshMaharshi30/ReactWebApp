@@ -14,14 +14,15 @@ class NavBar extends Component {
           <nav className="navbar navbar-light bg-light">
           <a className="navbar-brand" href="#">
     <img src={logo} width="100%" height="30" className="d-inline-block align-top" alt=""/>
-    Indicators Portal
+    <p>Indicators Portal</p>
+    <h1>IP</h1>
   </a>
 </nav>
           </div>
   
           <ul className="list-unstyled components">
               <li >
-                  <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" className="dropdown-toggle">Home</a>
+                  <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" className="dropdown-toggle"> <i className="fas fa-home"></i>Home</a>
                   <ul className="collapse list-unstyled" id="homeSubmenu">
                       <li>
                           <a href="#">Home 1</a>
