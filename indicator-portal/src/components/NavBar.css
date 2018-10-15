@@ -161,3 +161,11 @@ ul ul a {
 .navbar {
     margin-bottom: 0px;
 }
+
+
+/*
+Container CSS
+*/
+#content {
+    background-color: lightblue;
+}

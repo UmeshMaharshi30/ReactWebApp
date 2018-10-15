@@ -12,7 +12,7 @@ class App extends Component {
     return (
       <div className="container-fluid" style={rootContainer}>  
       <div className="row" style={rowMargin}>
-      <NavBar></NavBar>
+      <NavBar/>
       </div>
       </div>
     );

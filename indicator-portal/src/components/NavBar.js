@@ -3,12 +3,31 @@ import '../App.css';
 import './NavBar.css';
 import logo  from './../resources/logo.png';
 import VizContainer from './DataViz/DataVizContainer';
+import {changeVizPanel, Menu_details} from './../actions/index';
+import { connect } from "react-redux";
+
+const mapStateToProps = state => {
+    return { VizContainer: state.VizContainer };
+};
+  
+const mapDispatchToProps = dispatch => ({
+    changeVizPanel: dataViz => dispatch(changeVizPanel(dataViz))
+});
 
 
-class NavBar extends Component {
+const homePage = {title : "Welcome to Indicators Portal !", bodyType : "text", bodyText : "This site was developed using React and Redux"};
+
+
+
+class MenuPanel extends Component {
+
   render() {
+    var fullWidth = {
+          width : "100%"
+    };
+    const changeVizPanel = this.props.changeVizPanel;
     return (
-      <div className="wrapper">
+      <div className="wrapper" style={fullWidth}>
       <nav id="sidebar">
           <div className="sidebar-header">
           <nav className="navbar navbar-light bg-light">
@@ -21,22 +40,14 @@ class NavBar extends Component {
           </div>
   
           <ul className="list-unstyled components">
-              <li >
-                  <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" className="dropdown-toggle"> <i className="fas fa-home"></i>Home</a>
-                  <ul className="collapse list-unstyled" id="homeSubmenu">
-                      <li>
-                          <a href="#">Home 1</a>
-                      </li>
-                      <li>
-                          <a href="#">Indicators</a>
-                      </li>
-                      <li>
-                          <a href="#">Data Tools</a>
-                      </li>
-                  </ul>
+              <li onClick={() =>changeVizPanel(homePage)}>
+                  <a href="#">Home</a>
               </li>
               <li>
-                  <a href="#">Indicators</a>
+                  <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" className="dropdown-toggle"> <i className="fas fa-home"></i>Indicators</a>
+                  <ul className="collapse list-unstyled" id="homeSubmenu">{Menu_details.map(function(ind){
+                        return <li key={ind.title} onClick={() =>changeVizPanel(ind)}><a href="#" >{ind.title}</a></li>;})}
+                  </ul>
               </li>
               <li>
                   <a href="#">Data Tools</a>
@@ -52,7 +63,7 @@ class NavBar extends Component {
               </li>
           </ul>
       </nav>
-      <div id="content" >
+      <div id="content" className="container-fluid">
             <VizContainer></VizContainer>
         </div>
     </div>
@@ -60,5 +71,6 @@ class NavBar extends Component {
   }
 }
   
+const NavBar = connect(mapStateToProps, mapDispatchToProps)(MenuPanel);
 
 export default NavBar;
