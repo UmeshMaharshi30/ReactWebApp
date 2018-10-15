@@ -11,15 +11,21 @@ const Housing = {
     };
 const Population_Demographics = { 
     title : "Population and Demographics",
-    totalGraphs : 0
+    totalGraphs : 3,
+    graphs: [{title : "Graph1", graphType : LINE_GRAPH, dataUrl : "data/apples.csv", rendered : false},
+            {title : "Graph2", graphType : LINE_GRAPH, dataUrl : ""},
+            {title : "Graph3", graphType : LINE_GRAPH, dataUrl : ""}]
 };
 const Households_Families_Youth = { 
     title : "Households, Families, and Youth",
-    totalGraphs : 0
+    totalGraphs : 2,
+    graphs: [{title : "Graph1", graphType : LINE_GRAPH, dataUrl : "data/apples.csv", rendered : false},
+            {title : "Graph2", graphType : LINE_GRAPH, dataUrl : ""}]
 };
 const Income_Poverty = { 
     title : "Income and Poverty",
-    totalGraphs : 0
+    totalGraphs : 1,
+    graphs: [{title : "Graph1", graphType : LINE_GRAPH, dataUrl : "data/apples.csv", rendered : false}]
 };
 const Workforce = { 
     title : "Workforce",
