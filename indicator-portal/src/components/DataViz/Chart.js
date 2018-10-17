@@ -4,6 +4,7 @@ import ReactLoading from 'react-loading';
 import jsdom from 'jsdom';
 import {LINE_GRAPH, MULTI_LINE_GRAPH, BAR_GRAPH, GROUPED_BAR} from "./../../constants/graphTypes";
 
+
 const { JSDOM } = jsdom;
 let childCont;
 const graphBackGround = "#F0F0F0";
@@ -169,14 +170,17 @@ class Chart extends Component {
             x1 = d3.scaleBand().range([height, 0]).padding(0.05),
             y = d3.scaleLinear().range([height, 0]),
             z = d3.scaleOrdinal(d3.schemeCategory10);
-        
         x0.domain(go.rawData.map(function(d) { return +d.Year; }));
         x1.domain(keys).rangeRound([0, x0.bandwidth()]);
-        y.domain([0, d3.max(go.rawData, function(d) { return d3.max(keys, function(key) { return +d[key].replace(/,/g, "") }); })]).nice();
+        y.domain([0, d3.max(go.rawData, function(d) { return d3.max(keys, function(key) { 
+            if(typeof d[key] == 'number') return d[key]; 
+            else return +d[key].replace(/,/g, ""); 
+        }); })]).nice();
 
         var entity = go.rawData.forEach(function(d) {
             d.Year = +d.Year;
             keys.forEach(function(keyData) {
+                if(typeof d[keyData] == 'number') return d[keyData]; 
                 d[keyData] = +d[keyData].replace(/,/g, "");
                 if(d[keyData] === undefined) d[keyData] = 0;
             });
@@ -252,7 +256,7 @@ class Chart extends Component {
                 update_height = 0.8*430;
             } else {
                 update_width  = update_width - 100;
-                if(update_width > 650) update_width = 600;
+                if(update_width > 550) update_width = 500;
                 update_height = 0.8*update_width;
             }
             this.graphData.graphDimentions = [update_width, update_height];
@@ -296,8 +300,33 @@ class Chart extends Component {
     }
 
     render() {
+    var chartControl = {
+        paddingTop : "40px",
+        backgroundColor : "blue"
+    };
+
+    function downnLoadSVG(id, rthis) {
+
+        var canvas = document.createElement( "canvas" );
+            canvas.setAttribute("width", d3.select("#" + id).select("svg").style("width"));
+            canvas.setAttribute("height", d3.select("#" + id).select("svg").style("height"));
+        var ctx = canvas.getContext( "2d" );
+        var svg  = document.getElementById(id).children[0],
+            xml  = new XMLSerializer().serializeToString(svg),
+            data = "data:image/svg+xml;base64," + btoa(xml),
+            img  = new Image()
+            img.setAttribute('src', data);
+            img.onload = function() {
+                ctx.drawImage( img, 0, 0 );
+                var a = document.createElement("a");
+                    a.download = rthis.props.data.title;
+                    a.href = canvas.toDataURL("image/png");;
+                    a.click();
+            };
+    }
+
     if(!this.state.rendered) return (<ReactLoading type="bars" color="red" height={'10%'} width={'10%'} />); 
-    return (<div id={this.props.data.title.replace(/ /g, '')}></div>);
+    return (<div style={chartControl}><button onClick={() => downnLoadSVG(this.props.data.title.replace(/ /g, ''), this)}>Export</button><div id={this.props.data.title.replace(/ /g, '')}></div></div>);
     }
 }
 

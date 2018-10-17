@@ -4,7 +4,7 @@ import {LINE_GRAPH, MULTI_LINE_GRAPH, BAR_GRAPH, GROUPED_BAR} from "../constants
 const Housing = { 
     title : "Housing",
     totalGraphs : 2,
-    graphs: [{title : "Graph1", graphType : LINE_GRAPH, dataUrl : "data/apples.csv", title : "Housing 1", xLabel : "year", xLabel :"year", yLabel: "Production lbs", yKey : "Value", dataUrl: "data/apples.csv", dataType : "csv",  data: null},
+    graphs: [{title : "Graph1", graphType : GROUPED_BAR, dataUrl : "data/apples.csv", title : "Housing 1", xLabel : "year", xLabel :"year", yLabel: "Production lbs", yKey : "Value", dataUrl: "data/apples.csv", dataType : "csv",  data: null},
     {title : "Graph1", graphType : LINE_GRAPH, dataUrl : "data/apples.csv", title : "Housing 2", xLabel : "year", xLabel :"year", yLabel: "Production lbs", yKey : "Value", dataUrl: "data/apples.csv", dataType : "csv",  data: null}
     ]
     };

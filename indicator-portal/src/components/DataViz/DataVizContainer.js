@@ -17,7 +17,7 @@ class DataVizContainer extends Component {
   render() {
     const DataViz = this.props.VizContainer;
     var chartStyle = {
-      padding : "10px"
+      padding : "0px"
     };
     let bodyContent = "";
     if(DataViz.bodyType = "text") {
