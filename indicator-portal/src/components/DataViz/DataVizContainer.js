@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import 'bootstrap';
 import { connect } from "react-redux";
-import  o from "./../../lib/outreach";
-import * as d3 from "d3";
+
 import Chart from './Chart'
 
 const mapStateToProps = state => {
@@ -18,8 +17,7 @@ class DataVizContainer extends Component {
   render() {
     const DataViz = this.props.VizContainer;
     var chartStyle = {
-      padding : "10px",
-      height : "400px"
+      padding : "10px"
     };
     let bodyContent = "";
     if(DataViz.bodyType = "text") {
@@ -29,7 +27,7 @@ class DataVizContainer extends Component {
       //bodyContent = DataViz.graphs.map(function(g){ return <div key={g.title} id={DataViz.title + "_" + g.title}style={chartStyle} className="col-6 text-center">{g.title}</div>});
       
       bodyContent = DataViz.graphs.map(function(g){
-        return <div key={g.title} id={DataViz.title + "_" + g.title}style={chartStyle} className="col-6 text-center"><Chart data={g}></Chart></div>
+        return <div key={g.title} id={DataViz.title + "_" + g.title.replace(/ /g, '')} style={chartStyle} className="col-xl-6 text-center"><Chart data={g}></Chart></div>
       });
     }
     var rowMargin = {

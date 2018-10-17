@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import * as d3 from "d3";
-import  o from "./../../lib/outreach";
+import ReactLoading from 'react-loading';
 import jsdom from 'jsdom';
+import {LINE_GRAPH, MULTI_LINE_GRAPH, BAR_GRAPH, GROUPED_BAR} from "./../../constants/graphTypes";
 
 const { JSDOM } = jsdom;
 let childCont;
@@ -18,7 +19,8 @@ class Chart extends Component {
     constructor() {
         super();
         this.state = {
-            viz: "not loading"
+            viz: "not loading",
+            rendered : false
           };
     }
 
@@ -44,7 +46,7 @@ class Chart extends Component {
                 return {
                   id: id,
                   values: data.map(function(d) {
-                    if(d[id] != "" ) {
+                    if(d[id] !== "" ) {
                     return {date: +d.Year, Production: parseFloat(d[id].replace(/,/g, ""))};
                   }
                   })
@@ -54,7 +56,7 @@ class Chart extends Component {
              entity.forEach((element, index) => {
                 var sanitizedData = [];
                 element.values.forEach(elem => {
-                  if(elem != undefined) sanitizedData.push(elem);
+                  if(elem !== undefined) sanitizedData.push(elem);
                 });
                 entity[index].values = sanitizedData;
             });
@@ -156,38 +158,146 @@ class Chart extends Component {
         return dad.innerHTML.replace(/currentColor/g, 'black');
     }
     
-    
+    drawgroupedSTackBar(go, svg) {
+
+        var width = go.graphDimentions[0] - margin.left - margin.right,
+        height = go.graphDimentions[1] - margin.top - margin.bottom,
+        g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        var keys = go.rawData.columns.slice(1);
+        var x0 = d3.scaleBand().rangeRound([0, width]).paddingInner(0.1),
+            x1 = d3.scaleBand().range([height, 0]).padding(0.05),
+            y = d3.scaleLinear().range([height, 0]),
+            z = d3.scaleOrdinal(d3.schemeCategory10);
+        
+        x0.domain(go.rawData.map(function(d) { return +d.Year; }));
+        x1.domain(keys).rangeRound([0, x0.bandwidth()]);
+        y.domain([0, d3.max(go.rawData, function(d) { return d3.max(keys, function(key) { return +d[key].replace(/,/g, "") }); })]).nice();
+
+        var entity = go.rawData.forEach(function(d) {
+            d.Year = +d.Year;
+            keys.forEach(function(keyData) {
+                d[keyData] = +d[keyData].replace(/,/g, "");
+                if(d[keyData] === undefined) d[keyData] = 0;
+            });
+          });
+         go.data = go.rawData;
+
+
+        g.append("g")
+         .selectAll("g")
+        .data(go.data)
+        .enter().append("g")
+        .attr("transform", function(d) { return "translate(" + x0(d.Year) + ",0)"; })
+        .selectAll("rect")
+        .data(function(d) { return keys.map(function(key) { return {key: key, Value: d[key]}; }); })
+        .enter().append("rect")
+        .attr("x", function(d) { return x1(d.key); })
+        .attr("y", function(d) { return y(d.Value); })
+        .attr("width", x1.bandwidth())
+        .attr("height", function(d) { return height - y(d.Value); })
+        .attr("fill", function(d) { return z(d.key); });
+
+        g.append("g")
+            .attr("class", "axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x0));
+
+        g.append("g")
+            .attr("class", "axis")
+            .call(d3.axisLeft(y).ticks(null, "s"))
+            .append("text")
+            .attr("x", 20)
+            .attr("y", y(y.ticks().pop()) - 10.5)
+            .attr("dy", "0.32em")
+            .attr("fill", "#000")
+            .attr("text-anchor", "end")
+            .text(go.yLabel);
+
+            var legend = g.append("g")
+            .attr("font-family", "sans-serif")
+            .attr("font-size", 10)
+            .attr("text-anchor", "end")
+          .selectAll("g")
+          .data(keys.slice().reverse())
+          .enter().append("g")
+            .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+      
+        legend.append("rect")
+            .attr("x", width - 19)
+            .attr("width", 19)
+            .attr("height", 19)
+            .attr("fill", z);
+      
+        legend.append("text")
+            .attr("x", width - 24)
+            .attr("y", 9.5)
+            .attr("dy", "0.32em")
+            .text(function(d) { return d; });   
+            var dad = svg.node().parentNode;
+            return dad.innerHTML;
+    }
+
+    graphData = {};
+
+    updateDimensions() {
+        let update_width = 0;
+        let update_height = 0;
+        if(this.graphData.title) {
+            let divCont = d3.select("#" + this.graphData.title.replace(/ /g, ''));
+            if(divCont == null) return;
+            update_width = divCont.node().getBoundingClientRect().width;
+            if(update_width < 430) {
+                update_width = 430;
+                update_height = 0.8*430;
+            } else {
+                update_width  = update_width - 100;
+                if(update_width > 650) update_width = 600;
+                update_height = 0.8*update_width;
+            }
+            this.graphData.graphDimentions = [update_width, update_height];
+            d3.select("#" + this.graphData.title.replace(/ /g, '')).html("");
+            this.drawGraph(this, this.graphData);
+        }
+        
+    }
+
+
+    componentWillUnmount() {
+        window.removeEventListener("resize", this.updateDimensions.bind(this));
+    }
+
     componentDidMount() { 
         var comp = this;
-        var apples = o.generateObject();
-            apples.title = "Apple Market Details";  // graph title
-            apples.xLabel = "year"; // x axis label
-            apples.xKey = "Year"; 
-            apples.yLabel = "Production lbs"; // y axis label
-            apples.yKey = "Value";
-            apples.dataUrl = "data/apples.csv"; // path of the data file relative to the file in which it is being called 
-            apples.dataType = "csv";
-            apples.data = null; 
-            apples.containerId = this.props.data.title;
-            apples.graphDimentions = [500, 350];
-            var go = apples;
-            childCont = body.append("div").attr("id", "parent" + "_" + go.containerId);
-            var svg = childCont.append("svg").style("fill", "black").attr("id", go.containerId).style("width", go.graphDimentions[0] + "px").style("height", go.graphDimentions[1] + "px").style("background-color", graphBackGround);
-            if(go.title) {
-                svg.append("text").text(go.title).attr("x", go.graphDimentions[0]/2).attr("y", 20).style("text-anchor", "middle");
-            }
-            d3.csv(go.dataUrl, function(d, _, columns) {
-                return d;
-            }).then(function(data) {
-                go.rawData = data;
-                comp.setState({viz : comp.drawMultiLine(go, svg)});
-                //console.log("<svg>" + svg.html() + "</svg>");
+        this.updateDimensions();
+        window.addEventListener("resize", this.updateDimensions.bind(this));
+        this.graphData = comp.props.data; 
+        this.graphData.containerId = this.props.data.title;
+        d3.csv(comp.graphData.dataUrl, function(d, _, columns) {
+            return d;
+        }).then(function(data) {
+                comp.graphData.rawData = data;
+                comp.setState({rendered : true});
+                comp.updateDimensions();
+                //comp.drawGraph(comp, comp.graphData);
             });
             //multilineChart(apples);                  
     }
 
+
+    drawGraph(comp, go) {
+        childCont = d3.select("#" + go.title.replace(/ /g, ''));
+        var svg = childCont.append("svg").style("fill", "black").style("width", go.graphDimentions[0] + "px").style("height", go.graphDimentions[1] + "px").style("background-color", graphBackGround);
+        if(go.title) {
+            svg.append("text").text(go.title).attr("x", go.graphDimentions[0]/2).attr("y", 20).style("text-anchor", "middle");
+        }
+        if(comp.props.data.graphType === GROUPED_BAR) comp.setState({viz : comp.drawgroupedSTackBar(go, svg)});
+        if(comp.props.data.graphType === LINE_GRAPH) comp.setState({viz : comp.drawMultiLine(go, svg)});
+    }
+
     render() {
-    return (<div  dangerouslySetInnerHTML={{ __html: this.state.viz }}/>);
+    if(!this.state.rendered) return (<ReactLoading type="bars" color="red" height={'10%'} width={'10%'} />); 
+    return (<div id={this.props.data.title.replace(/ /g, '')}></div>);
     }
 }
 
